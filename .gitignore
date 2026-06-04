@@ -41,3 +41,6 @@ Thumbs.db
 
 # Excel
 *.xlsx
+
+# Videos
+*.mp4
