@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class MediumCNN(nn.Module):
 
-    def __init__(self):
+    def __init__(self, num_outputs=1):
 
         super().__init__()
 
@@ -48,7 +48,7 @@ class MediumCNN(nn.Module):
 
         self.classifier = nn.Sequential(
             nn.Dropout(0.3),
-            nn.Linear(256, 1)
+            nn.Linear(256, num_outputs)
         )
 
     def forward(self, x):
@@ -57,8 +57,9 @@ class MediumCNN(nn.Module):
         x = self.gap(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
+
         return x
 
 
-def build_medium_cnn():
-    return MediumCNN()
+def build_medium_cnn(num_outputs=1):
+    return MediumCNN(num_outputs=num_outputs)

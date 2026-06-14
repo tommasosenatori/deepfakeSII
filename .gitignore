@@ -25,7 +25,7 @@ datasets/
 # Outputs
 
 outputs/
-outputs_hpc/
+outputs_hpc_140k/
 notebooks/checkpoints/
 notebooks/lightning_logs/
 

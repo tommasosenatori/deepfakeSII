@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class SmallCNN(nn.Module):
 
-    def __init__(self):
+    def __init__(self, num_outputs=1):
 
         super().__init__()
 
@@ -26,7 +26,7 @@ class SmallCNN(nn.Module):
 
         self.gap = nn.AdaptiveAvgPool2d(1)
 
-        self.classifier = nn.Linear(64, 1)
+        self.classifier = nn.Linear(64, num_outputs)
 
     def forward(self, x):
 
@@ -38,4 +38,4 @@ class SmallCNN(nn.Module):
 
 
 def build_small_cnn():
-    return SmallCNN()
+    return SmallCNN(num_outputs=num_outputs)

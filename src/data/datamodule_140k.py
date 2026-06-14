@@ -8,12 +8,39 @@ from torchvision.datasets import ImageFolder
 
 import lightning.pytorch as pl
 
+
+
+class FixedClassImageFolder(ImageFolder):
+
+    def __init__(self, root, class_names, transform=None):
+        self.class_names = class_names
+        super().__init__(root=root, transform=transform)
+
+    def find_classes(self, directory):
+        classes = []
+        class_to_idx = {}
+
+        for class_index, class_name in enumerate(self.class_names):
+            class_path = Path(directory) / class_name
+
+            if not class_path.exists():
+                raise FileNotFoundError(f"Missing class folder: {class_path}")
+
+            classes.append(class_name)
+            class_to_idx[class_name] = class_index
+
+        return classes, class_to_idx
+    
+
+
 class RealFakeDataModule(pl.LightningDataModule):
 
     def __init__(self, dataset_path, batch_size=64, num_workers=0, subset_fraction=None, subset_seed=22, image_size=224):
         super().__init__()
 
         self.dataset_path = Path(dataset_path)
+
+        self.class_names = ["real", "fake"]
 
         self.train_path = self.dataset_path / "train"
         self.valid_path = self.dataset_path / "valid"
@@ -70,12 +97,13 @@ class RealFakeDataModule(pl.LightningDataModule):
         rng.shuffle(selected)
 
         return Subset(dataset, selected)
+    
 
     def setup(self, stage=None):
 
-        self.train_dataset = ImageFolder(self.train_path, transform=self.train_transform)
-        self.val_dataset = ImageFolder(self.valid_path, transform=self.eval_transform)
-        self.test_dataset = ImageFolder(self.test_path, transform=self.eval_transform)
+        self.train_dataset = FixedClassImageFolder(root=self.train_path, class_names=self.class_names, transform=self.train_transform)
+        self.val_dataset = FixedClassImageFolder(root=self.valid_path, class_names=self.class_names, transform=self.eval_transform)
+        self.test_dataset = FixedClassImageFolder( root=self.test_path, class_names=self.class_names, transform=self.eval_transform)
 
         self.train_dataset = self._balanced_subset(self.train_dataset, apply_subset=True)
         self.val_dataset = self._balanced_subset(self.val_dataset, apply_subset=True)
