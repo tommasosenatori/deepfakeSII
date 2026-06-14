@@ -37,5 +37,5 @@ class SmallCNN(nn.Module):
         return x
 
 
-def build_small_cnn():
+def build_small_cnn(num_outputs=1):
     return SmallCNN(num_outputs=num_outputs)
