@@ -10,6 +10,7 @@ from lightning.pytorch.loggers import TensorBoardLogger
 
 from src.data.factory import build_datamodule
 from src.models import ImageClassifier
+from src.evaluate import print_test_reports
 
 
 def get_num_classes(dataset_name, task):
@@ -254,14 +255,14 @@ def main(args):
     print("Best checkpoint:")
     print(checkpoint_callback.best_model_path)
 
-    best_model = ImageClassifier.load_from_checkpoint(
-        checkpoint_callback.best_model_path
-    )
+    best_model = ImageClassifier.load_from_checkpoint(checkpoint_callback.best_model_path)
 
-    test_results = trainer.test(best_model, datamodule=data_module)
+    compute_video_report = False
 
-    print("Test results:")
-    print(test_results)
+    if args.dataset_name == "ffpp":
+        compute_video_report = True
+
+    reports = print_test_reports(model=best_model, data_module=data_module, task=args.task, compute_video_report=compute_video_report)
 
 
 if __name__ == "__main__":
