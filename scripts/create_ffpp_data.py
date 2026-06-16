@@ -9,7 +9,7 @@ from tqdm import tqdm
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET_PATH = PROJECT_ROOT / "datasets" / "faceforensics++"
 SPLITS_PATH = DATASET_PATH / "splits"
-OUTPUT_DATASET_PATH = PROJECT_ROOT / "datasets" / "faceforensics++_6classes"
+OUTPUT_DATASET_PATH = PROJECT_ROOT / "datasets" / "faceforensics++_test"
 
 TRAIN_JSON = SPLITS_PATH / "train.json"
 VAL_JSON = SPLITS_PATH / "val.json"
@@ -43,9 +43,9 @@ SPLIT_TO_JSON["test"] = TEST_JSON
 # how many samples to use per image, for eahc split (taken from original ff++ paper)
 SPLIT_TO_SAMPLES = {}
 
-SPLIT_TO_SAMPLES["train"] = 27
-SPLIT_TO_SAMPLES["val"] = 10
-SPLIT_TO_SAMPLES["test"] = 10
+SPLIT_TO_SAMPLES["train"] = 1
+SPLIT_TO_SAMPLES["val"] = 1
+SPLIT_TO_SAMPLES["test"] = 100
 
 
 def create_output_folders():
