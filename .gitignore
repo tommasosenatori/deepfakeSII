@@ -46,3 +46,10 @@ Thumbs.db
 
 # Videos
 *.mp4
+
+# Requirements
+requirements_py310.txt
+
+# gitignore!
+
+.gitignore
