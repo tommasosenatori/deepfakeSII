@@ -4,12 +4,12 @@ import json
 import csv
 import pandas as pd
 from tqdm import tqdm
-
+import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET_PATH = PROJECT_ROOT / "datasets" / "faceforensics++"
 SPLITS_PATH = DATASET_PATH / "splits"
-OUTPUT_DATASET_PATH = PROJECT_ROOT / "datasets" / "faceforensics++_test"
+OUTPUT_DATASET_PATH = PROJECT_ROOT / "datasets" / "faceforensics++_6classes"
 
 TRAIN_JSON = SPLITS_PATH / "train.json"
 VAL_JSON = SPLITS_PATH / "val.json"
@@ -43,8 +43,8 @@ SPLIT_TO_JSON["test"] = TEST_JSON
 # how many samples to use per image, for eahc split (taken from original ff++ paper)
 SPLIT_TO_SAMPLES = {}
 
-SPLIT_TO_SAMPLES["train"] = 1
-SPLIT_TO_SAMPLES["val"] = 1
+SPLIT_TO_SAMPLES["train"] = 270
+SPLIT_TO_SAMPLES["val"] = 100
 SPLIT_TO_SAMPLES["test"] = 100
 
 
@@ -142,11 +142,27 @@ def get_uniform_frame_numbers(total_frames, number_of_samples):
 
 
 def get_haar_detector():
-    haar_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-    detector = cv2.CascadeClassifier(haar_path)
-    if detector.empty():
-        raise RuntimeError("Haar cascade not loaded correctly.")
-    return detector
+
+    possible_paths = []
+
+    if hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
+        possible_paths.append(Path(cv2.data.haarcascades) / "haarcascade_frontalface_default.xml")
+
+    conda_prefix = os.environ.get("CONDA_PREFIX")
+
+    if conda_prefix is not None:
+        possible_paths.append(Path(conda_prefix) / "share" / "opencv4" / "haarcascades" / "haarcascade_frontalface_default.xml")
+        possible_paths.append(Path(conda_prefix) / "share" / "opencv" / "haarcascades" / "haarcascade_frontalface_default.xml")
+
+    for haar_path in possible_paths:
+        if haar_path.exists():
+            detector = cv2.CascadeClassifier(str(haar_path))
+
+            if not detector.empty():
+                print("Using Haar cascade:", haar_path)
+                return detector
+
+    raise RuntimeError("Haar cascade not found.")
 
 
 # face region detection with haar detector

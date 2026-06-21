@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import torch
 from torch.utils.data import Subset
 from sklearn.metrics import classification_report
@@ -47,7 +48,7 @@ def collect_predictions(model, data_module, task, device=None):
 
     with torch.no_grad():
 
-        for images, labels in dataloader:
+        for images, labels in tqdm(dataloader, desc="Testing frames"):
 
             images = images.to(device)
 
@@ -132,7 +133,7 @@ def build_ffpp_frame_predictions(data_module, y_true, y_pred, y_prob, target_nam
 
     rows = []
 
-    for dataset_index in range(len(dataset)):
+    for dataset_index in tqdm(range(len(dataset)), desc="Building frame dataframe"):
 
         frame_path, raw_label = get_sample_path_and_raw_label(dataset, dataset_index)
 
@@ -180,7 +181,7 @@ def aggregate_frame_predictions_to_video(frame_df, target_names):
 
     grouped = frame_df.groupby(["raw_class", "video_key"], sort=False)
 
-    for (raw_class, video_key), group in grouped:
+    for (raw_class, video_key), group in tqdm(grouped, total=grouped.ngroups, desc="Aggregating videos"):
 
         mean_probs = group[prob_columns].mean().values
 
